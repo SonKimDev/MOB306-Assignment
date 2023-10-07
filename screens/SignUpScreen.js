@@ -1,12 +1,48 @@
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import React, {useState} from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db } from '../config/firebase';
+import { ref, set } from 'firebase/database';
 
 const SignUpScreen = () => {
   
   const [email, setEmail] = useState(''); 
   const [password, setPassword] = useState('');
   const [checkPassword, setCheckPassword] = useState('');
+
+
+  const handleAddUser = async() => {
+    try {
+        if(email.length<=0){
+            alert('please enter email');
+            return;
+        }else if(password.length<=0){
+            alert('please enter password');
+            return;
+        }else if(checkPassword.length<=0){
+            alert('please enter check password');
+            return;
+        }else if(checkPassword!==password){
+            alert('password and check password are not the same');
+            return;
+        }else{
+            await createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential)=>{
+                const user = userCredential.user;
+                const userData = {
+                    type: 2,
+                    userName: 'Người dùng',
+                    image: null,
+                };
+                const userRef = ref(db, 'users/'+user.uid);
+                set(userRef,userData);
+            })
+        }
+    } catch (error) {
+        console.log('error: ', error);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -34,7 +70,7 @@ const SignUpScreen = () => {
             secureTextEntry
             style={styles.input}
         />
-        <TouchableOpacity style={styles.buttonSignUpContainer}>
+        <TouchableOpacity style={styles.buttonSignUpContainer} onPress={handleAddUser}>
             <Text style={styles.buttonSignUpContent}>Register</Text>
         </TouchableOpacity>
       </View>
