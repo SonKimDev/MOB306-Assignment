@@ -33,7 +33,7 @@ const SignUpScreen = () => {
                 const userData = {
                     type: 2,
                     userName: 'Người dùng',
-                    image: null,
+                    image: '',
                 };
                 const userRef = ref(db, 'users/'+user.uid);
                 set(userRef,userData);

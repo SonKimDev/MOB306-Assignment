@@ -14,12 +14,14 @@ const UserScreenStyle = StyleSheet.create({
     userImageContainer:{
       width: 80,
       height: 80,
-      borderRadius: 100,
-      backgroundColor: '#173d56',
       marginRight: 16,
     },
     userImageContent:{
-      borderRadius: 20,
+      width: 80,
+      height: 80,
+      borderRadius: 100,
+      borderWidth: 1,
+      borderColor: '#173d56',
     },
     userContainer:{
     },

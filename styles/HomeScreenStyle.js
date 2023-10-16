@@ -3,7 +3,7 @@ import {StyleSheet} from 'react-native'
 const HomeScreenStyle = StyleSheet.create({
     container:{
       backgroundColor: '#eef6f8',
-       flex: 1,
+      flex: 1,
     },
     logoContainer:{
       paddingTop: 8,

@@ -4,10 +4,12 @@ import SplashScreen from 'react-native-splash-screen'
 import * as Icon from "react-native-feather";
 import styles from '../styles/HomeScreenStyle';
 import ModalAddBlog from '../components/ModalAddBlog';
+import useAuth from '../hooks/useAuth';
+import { get, onChildChanged, onValue, ref } from 'firebase/database';
+import { db } from '../config/firebase';
 
-const HomeScreen = () => {
-  const [focus, setFocus] = useState(null);
-  const [isShowModalAddBlog, setIsShowModalAddBlog] = useState(false);
+const HomeScreen = ({navigation}) => {
+  const [focus, setFocus] = useState(0);
   useEffect(()=>{
     const timer = setTimeout(()=>{
       SplashScreen.hide();
@@ -39,18 +41,19 @@ const HomeScreen = () => {
     },
   ]
 
-  const news = [
-    {
-      title: 'Hot news 1',
-      description: 'Quynh Non player got 5 headshots to help PTSX team win Valorant Champion 2023!',
-      image: 'https://liquipedia.net/commons/images/thumb/8/8a/VCT_Champions_2023_allmode.png/600px-VCT_Champions_2023_allmode.png'
-    },
-    {
-      title: 'Hot news 2',
-      description: 'Just Rick Roll',
-      image: 'https://assets.telegraphindia.com/telegraph/2023/Jan/1672986231_rick-rolled.jpg'
-    }
-  ];
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    const dataRef = ref(db, 'blogs');
+    
+    onValue(dataRef, (snapshot) =>{
+      const data = snapshot.val();
+      const dataMaps = Object.values(data);
+      setNews(dataMaps);
+      console.log(news);
+    })
+    
+  }, []);
 
   const renderItem = ({item,index}) => {
     return(
@@ -64,12 +67,17 @@ const HomeScreen = () => {
   }
 
   const renderNews = ({item}) => {
+
+    const handleSeeMore = () => {
+      navigation.navigate('Blog', {item: item});
+    }
+
     return(
-      <TouchableOpacity style={{borderWidth: 1, borderRadius: 10, padding: 12, backgroundColor: 'white', borderColor: '#173d56', elevation: 8, marginBottom: 16, flexDirection: 'row', flex: 1, maxHeight: 100}}>
+      <TouchableOpacity onPress={handleSeeMore} style={{borderWidth: 1, borderRadius: 10, padding: 12, backgroundColor: 'white', borderColor: '#173d56', elevation: 8, marginBottom: 16, flexDirection: 'row', flex: 1, maxHeight: 100}}>
         <View style={{width: '20%',borderRadius: 100, justifyContent: 'center', alignItems: 'center', marginRight: 8,}}>
           <Image
-            source={{uri: item.image}}
-            style={{width: '100%', height: '100%' ,borderRadius: 100,}}
+            source={{uri: item.imageLink}}
+            style={{width: '100%', height: '100%' , borderRadius: 100,}}
           />
         </View>
         <View style={{width: '80%'}}>
@@ -100,15 +108,6 @@ const HomeScreen = () => {
         data={news}
         renderItem={renderNews}
         style={{padding: 16,}}
-      />
-      <TouchableOpacity style={styles.addBlogContainer} onPress={()=>setIsShowModalAddBlog(true)}>
-        <Text style={styles.addBlogContent}>
-          +
-        </Text>
-      </TouchableOpacity>
-      <ModalAddBlog
-          visible={isShowModalAddBlog}
-          onCancel={()=>setIsShowModalAddBlog(false)}
       />
     </SafeAreaView>
   )
